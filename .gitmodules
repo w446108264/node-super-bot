@@ -4,3 +4,6 @@
 [submodule "submodule/node-weixin-message"]
 	path = submodule/node-weixin-message
 	url = https://w446108264@github.com/w446108264/node-weixin-message.git
+[submodule "submodule/config"]
+	path = submodule/config
+	url = git@git.oschina.net:wuduohangcheng/config.git
