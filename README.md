@@ -4,14 +4,12 @@
 > 
 > 持续集成的通知模块，让开发自动化且有乐趣。
  
-<img src="https://github.com/w446108264/node-super-bot/raw/master/doc/intro.png" width="100%" /> 
+<img src="https://github.com/w446108264/node-super-bot/raw/master/doc/rec/intro.png" width="100%" /> 
 
 # 介绍
 > 简单的实践
  
-<a href="http://www.shengjun.red/ci/ci.svg" ><img src="https://github.com/w446108264/node-super-bot/raw/master/doc/rec/ci.png" width="100%" /> </a>
-
-
+<a href="http://www.shengjun.red/ci/ci.svg" ><img src="https://github.com/w446108264/node-super-bot/raw/master/doc/rec/ci.png" width="100%" /> </a> 
 
 # 部署
 
@@ -23,8 +21,18 @@ npm install
 pm2 start bin/run
 
 ```
+ 
 
-基础配置参考https://github.com/w446108264/node-super-bot/blob/master/config/default.json
+## 配置说明
+
+* [进阶开发环境和部署配置](https://github.com/w446108264/node-super-bot/doc/进阶开发环境和部署配置.md)
+* [蒲公英配置](https://github.com/w446108264/node-super-bot/doc/蒲公英配置.md)
+* [微信企业号相关配置](https://github.com/w446108264/node-super-bot/doc/微信企业号相关配置.md)
+* [邮件相关配置](https://github.com/w446108264/node-super-bot/doc/邮件相关配置.md)
+* [slack相关配置](https://github.com/w446108264/node-super-bot/doc/slack相关配置.md)
+* [gank相关配置](https://github.com/w446108264/node-super-bot/doc/gank相关配置.md)
+
+
 
 # 效果
 
