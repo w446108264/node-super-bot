@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+
+var _config = require('config');
+/**
+ * the model of environment
+ *
+ * <p>
+ * when you set the param like that (export NODE_ENV=debug) before (node index.js),
+ * the app will read the config in file ./config/dev.json
+ * if not, will read the config in file ./config/default.json
+ * you can make your own config on ./config such like ./config/product.json
+ * start simple:{@code
+ *     export NODE_ENV=debug
+ *     export NODE_CONFIG_DIR="./submodule/config"
+ *     node app.js
+ * }
+ * </p>
+ */
+global.g_config = initConfig();
+
+function initConfig() {
+
+    var config = JSON.parse(JSON.stringify(_config));
+
+    var error = " NODE_ENV=" + process.env.NODE_ENV + " please check your config file which path named \"node-super-bot/config/" + process.env.NODE_ENV + ".json\"";
+    if (config == null) {
+        throw "can't find config!" + error;
+    }
+    return config;
+}
+
+/**
+ * Module dependencies.
+ */
+var app = require('../src/app');
+var debug = require('debug')('demo:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+var port = normalizePort(process.env.PORT || g_config.server.port || '3000');
+
+/**
+ * Create HTTP server.
+ */
+var server = http.createServer(app.callback());
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}

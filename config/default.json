@@ -1,0 +1,143 @@
+{
+  "server": {
+    "port": 10000
+  },
+  /**
+  * http://qydev.weixin.qq.com/wiki/index.php
+  * common_wechat 为空则无法使用 common类型的微信功能, 如回调模式的验证和回调消息的接收
+  */
+  "common_wechat": {
+    "corpID": "",
+    "secret": "",
+    // 回调模式需要参数
+    "encodingAESKey": "",
+    // 回调模式需要参数
+    "token": "",
+    // 默认测试通知频道
+    "agentid_dev": 3,
+    // 发送到哪些用户
+    "touser": "@all"
+  },
+  "common_email": {
+    "to": [
+      "xxx@xxx.com"
+    ],
+    "from": {
+      // https://github.com/andris9/nodemailer-wellknown#supported-services 支持列表
+      "service": "qqex",
+      "port": 465,
+      "secureConnection": true,
+      "auth": {
+        "user": "xx@xxx.com",
+        "pass": "xxx"
+      }
+    }
+  },
+  /**
+  * 为空则无法使用gank相关功能
+  * 1.每日推送图片,支持微信，slack
+  * 2.微信获取随机gank图片
+  */
+  "gank": {
+    // 每周1-5 自动抓取gank一张图片 hour
+    "schedule_getimage_hour": 13,
+    // 每周1-5 自动抓取gank一张图片 minute
+    "schedule_getimage_minute": 0,
+    // [NOT NULL] 每周1-5 自动抓取gank一张图片保存位置
+    "file_save_path": "../temp",
+    /**
+    * 为空不推送gank image到wechat
+    */
+    "wechat": {
+      "corpID": "",
+      "secret": "",
+      "gank_agentid": 3,
+      "gank_touser": "@all"
+    },
+    /**
+    * 为空不推送gank image到slack
+    */
+    "slack": {
+      "channel": "",
+      "icon_emoji": ":dog:",
+      "username": ""
+    }
+  },
+  /**
+  * 为空则无法使用pgyer相关功能
+  * 1.pgyer指定app的更新自动推送通知
+  * 2.获取pgyer指定app的build history
+  */
+  "pgyer": {
+    /**
+    * 接入多个pgyer app配置, 每个app以自定义appid区分
+    * https://www.pgyer.com/doc/api#paramInfo
+    */
+    "app": [
+      {
+        // 用户自定义的id(必须保证当前数组内唯一), 通常为包名,用来识别对应蒲公英其他参数
+        "appid": "cc.xx.app",
+        // App Id   表示一个App组的唯一ID。例如，名称为"微信"的App上传了三个版本，那么这三个版本为一个App组，该参数表示这个组的ID
+        "aId": "",
+        // API Key  API Key，用来识别API调用者的身份，如不特别说明，每个接口中都需要含有此参数。对于同一个蒲公英的注册用户来说，这个值在固定的
+        "_api_key": "",
+        // pgyer主页 或 其他下载主页
+        "url_main": "https://www.pgyer.com/xxx",
+        // 二维码
+        "url_image_qc": "https://static.pgyer.com/app/qrcode/xxx",
+        /**
+        * 当前appid对应app产生事件所发出通知的目标wechat配置
+        * 为空则该app的事件不使用wechat通知
+        */
+        "wechat": {
+          "corpID": "",
+          "secret": "",
+          "update_agentid": 3,
+          "update_touser": "@all",
+          "update_title": ""
+        },
+        /**
+        * 当前appid对应app产生事件所发出通知的目标email配置
+        * 为空则该app的事件不使用email通知
+        */
+        "email": {
+          "to": [
+            "xxx@xxx.com"
+          ],
+          "from": {
+            // https://github.com/andris9/nodemailer-wellknown#supported-services 支持列表
+            "service": "qqex",
+            "port": 465,
+            "secureConnection": true,
+            "auth": {
+              "user": "xx@xxx.com",
+              "pass": "xxx"
+            }
+          },
+          "data": {
+            /**
+            * subject 邮件标题,不为空则 subject + version name
+            */
+            "subject": "新版本来啦 -> ",
+            /**
+            * subject 邮件标题,不为空则 text + version description
+            */
+            "text": ""
+          }
+        },
+        /**
+        * 当前appid对应app产生事件所发出通知的目标slack配置
+        * 为空则该app的事件不使用slack通知
+        */
+        "slack": {
+          "channel": "https://hooks.slack.com/services/T13NX0QTT/B1C7DG6MC/xxxx",
+          "icon_emoji": ":chicken:",
+          "username": "xxx-VersionBot",
+          "pretext": "*轰轰轰 xxx 新版本来啦 ->  ",
+          "footer": "xxx小分队",
+          "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png"
+        }
+      }
+    ]
+  }
+}

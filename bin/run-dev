@@ -1,0 +1,7 @@
+
+var current_path = process.cwd();
+
+process.env.NODE_ENV = "dev"
+process.env.NODE_CONFIG_DIR = "./submodule/config"
+
+require('runkoa')(current_path + '/bin/www' )

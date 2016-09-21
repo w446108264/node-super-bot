@@ -1,0 +1,17 @@
+<html>
+<head>
+    <title> 版本履历 </title>
+</head>
+<body>
+<h1>版本履历 : <%= name %></h1>
+<h1>下载地址 : <a href=<%= url %>><%= url %></a></h1>
+<h1>扫描下载 : <img src=<%= image %>></h1>
+<br/>
+
+<% historydescs.forEach(function(historydesc){ %>
+<% data = historydesc; %>
+<% include historydesc.ejs %>
+<% }) %>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+[submodule "submodule/core-wechat"]
+	path = submodule/core-wechat
+	url = https://w446108264@github.com/w446108264/core-wechat.git
+[submodule "submodule/node-weixin-message"]
+	path = submodule/node-weixin-message
+	url = https://w446108264@github.com/w446108264/node-weixin-message.git
