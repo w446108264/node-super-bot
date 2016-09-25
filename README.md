@@ -1,4 +1,4 @@
-# node-super-bot
+# node-super-bot    
 
 > j.s 🇨🇳
 > 
@@ -24,7 +24,7 @@ pm2 start bin/run
 
 ```
 
-基础配置参考https://github.com/w446108264/node-super-bot/blob/master/config/default.json
+# [文档](https://github.com/w446108264/node-super-bot/wiki)  
 
 # 效果
 
