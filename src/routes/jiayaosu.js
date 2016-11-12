@@ -4,6 +4,9 @@ let log = baseCore.getLogger();
 
 var rd = require('rd');
 
+/**
+ * 自助渠道包
+ */
 router.get('/', async function (ctx, next) {
 
     ctx.state = {
@@ -45,6 +48,9 @@ router.get('/', async function (ctx, next) {
     });
 })
 
+/**
+ * 获取当前版本相关信息和渠道列表
+ */
 router.get('/filelist', async function (ctx, next) {
     var v = ctx.query.v;
 
@@ -70,15 +76,9 @@ router.get('/filelist', async function (ctx, next) {
     });
 })
 
-
-router.get('/channel', async function (ctx, next) {
-    ctx.state = {
-        title: '家的要素-Android 渠道包自助获取'
-    };
-
-    await ctx.render('./jiayaosu/build.ejs', {});
-})
-
+/**
+ * 补增渠道
+ */
 router.post('/', async function (ctx, next) {
 
     /**

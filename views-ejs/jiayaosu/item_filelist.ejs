@@ -1,6 +1,30 @@
-<div >
+<div class="content" id="content">
     <% channelFiles.forEach(function(channelFile){ %>
     <% data = channelFile; %>
     <% include item_channel.ejs %>
     <% }) %>
 </div>
+
+<body onload="load()">
+</body>
+
+<script>
+
+    function $(id) {
+        return document.getElementById(id);
+    }
+
+    function load() {
+        setContent();
+    }
+
+    function setContent() {
+        var height = 20;
+        var content = document.getElementById('content');
+        var style = window.getComputedStyle
+                ? window.getComputedStyle(content, null)
+                : content.currentStyle;
+        height += parseInt(style.height, 10);
+        parent.window.resize(height);
+    }
+</script>

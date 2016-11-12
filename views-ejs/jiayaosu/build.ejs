@@ -18,7 +18,7 @@
         </select>
     </div>
 
-    <iframe frameborder="0" id="external-frame" width="100%" ></iframe>
+    <iframe style="margin-top:10px" frameborder="0" id="iframe" frameborder="0" width="100%" height="200"></iframe>
 
     <p>2.补增渠道</p>
     <div>
@@ -40,26 +40,12 @@
     function gradeChange() {
         var objS = document.getElementById("selectVersion");
         var version = objS.options[objS.selectedIndex].value;
-        document.getElementById("external-frame").src = '/jiayaosu/filelist?v=' + version;
-        setIframeHeight(document.getElementById('external-frame'));
+        document.getElementById("iframe").src = '/jiayaosu/filelist?v=' + version; 
     }
 
-    /*
-     * When the iframe is on a different subdomain, uncomment the following line
-     * and change "example.com" to your domain.
-     */
-    // document.domain = "example.com";
-    function setIframeHeight(iframe) {
-        if (iframe) {
-            var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
-            if (iframeWin.document.body) {
-                iframe.height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
-            }
-        }
-    }
-
-    window.onload = function () {
-        setIframeHeight(document.getElementById('external-frame'));
+    function resize(height) {
+        var iframe = document.getElementById('iframe');
+        iframe.style.height = height + 'px';
     }
 </script>
 </body>
