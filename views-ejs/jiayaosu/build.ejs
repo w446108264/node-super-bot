@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+<h1><%= title %></h1>
+
+<form method="POST">
+
+    <p>1.请选择版本</p>
+    <div>
+        <select id="selectVersion" name="selectVersion" onchange="gradeChange()">
+            <% targets.forEach(function(target){ %>
+            <option value= <%- target.version %>><%- target.version %></option>
+            <% }) %>
+        </select>
+    </div>
+
+    <iframe frameborder="0" id="external-frame" width="100%" ></iframe>
+
+    <p>2.补增渠道</p>
+    <div>
+        <textarea name="txtChannel" cols=40 rows=4> </textarea>
+    </div>
+
+    <p>3.请填写授权码</p>
+    <div>
+        <textarea name="txtV" cols=40 rows=1> </textarea>
+    </div>
+
+    <input type="submit" value="提交" style="margin-top:10px">
+</form>
+
+<script type="text/javascript">
+
+    gradeChange();
+
+    function gradeChange() {
+        var objS = document.getElementById("selectVersion");
+        var version = objS.options[objS.selectedIndex].value;
+        document.getElementById("external-frame").src = '/jiayaosu/filelist?v=' + version;
+        setIframeHeight(document.getElementById('external-frame'));
+    }
+
+    /*
+     * When the iframe is on a different subdomain, uncomment the following line
+     * and change "example.com" to your domain.
+     */
+    // document.domain = "example.com";
+    function setIframeHeight(iframe) {
+        if (iframe) {
+            var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
+            if (iframeWin.document.body) {
+                iframe.height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
+            }
+        }
+    }
+
+    window.onload = function () {
+        setIframeHeight(document.getElementById('external-frame'));
+    }
+</script>
+</body>
+</html>

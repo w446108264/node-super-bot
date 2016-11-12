@@ -12,6 +12,7 @@ const index = require('./routes/index');
 const wechat = require('./routes/wechat');
 const email = require('./routes/email');
 const version = require('./routes/version');
+const jiayaosu = require('./routes/jiayaosu');
 
 let baseCore = require('core-base');
 let log = baseCore.getLogger();
@@ -37,6 +38,7 @@ router.use('/', index.routes(), index.allowedMethods());
 router.use('/wechat', wechat.routes(), wechat.allowedMethods());
 router.use('/email', email.routes(), email.allowedMethods());
 router.use('/version', version.routes(), version.allowedMethods());
+router.use('/jiayaosu', jiayaosu.routes(), jiayaosu.allowedMethods());
 
 app.use(router.routes(), router.allowedMethods());
 app.on('error', function (err, ctx) {
