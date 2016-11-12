@@ -1,5 +1,6 @@
 # Logs
 *.log
+*.apk
 npm-debug.log*
 
 # Runtime data
@@ -34,3 +35,7 @@ node_modules
 
 # Other
 .idea/
+
+
+output/
+sourceApk/
