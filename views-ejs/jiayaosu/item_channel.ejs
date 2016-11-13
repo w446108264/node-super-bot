@@ -1,5 +1,9 @@
-<div class="item_channel" style = "margin-top:4px" >
+<div class="item_channel" style="margin-top:4px">
 
-    <a class="name" href=" <%- channelFile.name %> " ><%- channelFile.name %></a>
+    <tr>
+        <td><a class="name" href="<%- channelFile.url %>"><%- channelFile.name %></a></td>
+        <td><%- channelFile.size %></td>
+        <td><%- channelFile.date %></td>
+    </tr>
 
 </div>

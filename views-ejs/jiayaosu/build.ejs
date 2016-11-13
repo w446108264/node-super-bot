@@ -27,7 +27,7 @@
 
     <p>3.请填写授权码</p>
     <div>
-        <textarea name="txtV" cols=40 rows=1> </textarea>
+        <textarea name="txtAuth" cols=40 rows=1> </textarea>
     </div>
 
     <input type="submit" value="提交" style="margin-top:10px">
@@ -40,7 +40,7 @@
     function gradeChange() {
         var objS = document.getElementById("selectVersion");
         var version = objS.options[objS.selectedIndex].value;
-        document.getElementById("iframe").src = '/jiayaosu/filelist?v=' + version; 
+        document.getElementById("iframe").src = '/jiayaosu/filelist?v=' + version;
     }
 
     function resize(height) {

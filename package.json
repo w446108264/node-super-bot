@@ -34,6 +34,7 @@
     "node-weixin-crypto": "^0.2.0",
     "node-weixin-message": "file:./submodule/node-weixin-message",
     "nodemailer": "^2.6.0",
+    "prettysize": "0.0.3",
     "raw-body": "^2.1.7",
     "rd": "^1.0.0",
     "request": "^2.74.0",
