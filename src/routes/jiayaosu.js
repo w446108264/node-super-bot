@@ -57,17 +57,29 @@ router.get('/filelist', async function (ctx, next) {
     var v = ctx.query.v;
 
     var channelFiles = [];
+
     var channelPaths = rd.readFileFilterSync(process.cwd() + '/output/' + v, /\.apk$/);
     /**
      * 过滤版本文件 jiayaosu-1.0-dev-preview-2016111209
      */
     for (var i = 0; i < channelPaths.length; i++) {
-        var fileName = channelPaths[i].indexOf("/") >= 0
-            ? channelPaths[i].substring(channelPaths[i].lastIndexOf("/"), channelPaths[i].length)
-            : channelPaths[i];
+        exports.getInfo(channelPaths[i], channelFiles,v);
+    }
 
-        /**
-         * {@code { dev: 16777220,
+    await ctx.render('./jiayaosu/item_filelist.ejs', {
+        "channelFiles": channelFiles
+    });
+})
+
+
+exports.getInfo = async function (channelPaths, channelFiles, v) {
+
+    var fileName = channelPaths.indexOf("/") >= 0
+        ? channelPaths.substring(channelPaths.lastIndexOf("/"), channelPaths.length)
+        : channelPaths;
+
+    /**
+     * {@code { dev: 16777220,
              mode: 33188,
              nlink: 1,
              uid: 501,
@@ -80,24 +92,22 @@ router.get('/filelist', async function (ctx, next) {
              atime: Wed May 27 2015 18:24:43 GMT+0800 (CST),
              mtime: Wed May 27 2015 18:26:25 GMT+0800 (CST),
              ctime: Wed May 27 2015 18:26:25 GMT+0800 (CST) }}
-         */
-        fs.stat(channelPaths[i], function (err, stats) {
-            log.info(channelPaths[i]);
-            var channelFile = {
-                name: fileName,
-                url: "http://139.224.73.230/android/repository/jiayaosu/" + v + fileName,
-                size: pretty(stats.size),
-                date: exports.formatTime(stats.mtime)
-            };
-            log.info(channelFile.name);
-            channelFiles.push(channelFile);
-        })
-    }
+     */
+    fs.stat(channelPaths, function (err, stats) {
+        log.info(channelPaths);
+        var channelFile = {
+            name: fileName,
+            url: "http://139.224.73.230/android/repository/jiayaosu/" + v + fileName,
+            size: pretty(stats.size),
+            date: exports.formatTime(stats.mtime)
+        };
+        log.info(channelFile.name);
+        channelFiles.push(channelFile);
 
-    await ctx.render('./jiayaosu/item_filelist.ejs', {
-        "channelFiles": channelFiles
-    });
-})
+    })
+
+
+}
 
 
 /**
@@ -108,34 +118,55 @@ router.post('/', async function (ctx, next) {
     /**
      * 获取渠道
      */
-    var txtChannel = ctx.body.txtChannel;
-    var txtAuth = ctx.body.txtAuth;
+    var txtChannel = ctx.body.channel;
+    var txtAuth = ctx.body.auth;
 
     /**
-     * 校验渠道合法
+     * 校验渠道
      */
+    if(!exports.checkChannel(txtChannel)) {
+        ctx.body = {
+            error: "请输入合法渠道!"
+        }
+        return;
+    }
+
+    /**
+     * 校验授权码
+     */
+    if("jiayaosu" != txtAuth.trim()) {
+        ctx.body = {
+            error: "请输入正确的授权码!"
+        }
+        return;
+    }
 
     /**
      * 生成渠道包
      */
-
-    log.info(txtChannel);
-    log.info(txtAuth);
-
-
-    // ctx.state = {
-    //     title: txtChannel
-    // };
-    //
-    // await ctx.redirect('/jiayaosu');
-
-    // ctx.body = "ok";
-
-    // await ctx.send(ctx, './jiayaosu/build_success.ejs', "");
-
-    ctx.body = {
-        "result": true
+    var channels = txtChannel.split("\n");
+    log.info("xx:" + channels.length + "  " +txtChannel);
+    for(var i = 0 ; i < channels.length ;i ++) {
+        var channel = channels[i].trim();
     }
+
+    fs.writeFile('input.txt', '我是通过写入的文件内容！',  function(err) {
+        if (err) {
+            return console.error(err);
+        }
+        console.log("数据写入成功！");
+        console.log("--------我是分割线-------------")
+        console.log("读取写入的数据！");
+        fs.readFile('input.txt', function (err, data) {
+            if (err) {
+                return console.error(err);
+            }
+            console.log("异步读取文件数据: " + data.toString());
+        });
+    });
+
+
+
 })
 
 /**
@@ -150,6 +181,18 @@ exports.formatTime = function (time) {
         + "-" + date.getDay()
         + " " + date.getHours()
         + ":" + date.getMinutes();
+}
+
+/**
+ * 校验渠道合法
+ * @param txtChannel
+ * @returns {string}
+ */
+exports.checkChannel = function (txtChannel) {
+    if(txtChannel == null || txtChannel == "") {
+        return false;
+    }
+    return true;
 }
 
 module.exports = router;

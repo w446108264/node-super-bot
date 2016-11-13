@@ -2,7 +2,7 @@
 <html>
 <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <!--<link rel='stylesheet' href='/stylesheets/style.css'/>-->
 </head>
 <body>
 <h1><%= title %></h1>
@@ -22,17 +22,17 @@
 
     <p>2.补增渠道</p>
     <div>
-        <textarea name="txtChannel" cols=40 rows=4> </textarea>
+        <textarea name="txtChannel" cols=40 rows=4 id="txtChannel"> </textarea>
     </div>
 
     <p>3.请填写授权码</p>
     <div>
-        <textarea name="txtAuth" cols=40 rows=1> </textarea>
+        <textarea name="txtAuth" cols=40 rows=1 id="txtAuth"> </textarea>
     </div>
 
-    <input type="submit" value="提交" style="margin-top:10px">
+    <input type="submit" value="提交" style="margin-top:10px" id="submitBtn">
 </form>
-
+<script src="http://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
 <script type="text/javascript">
 
     gradeChange();
@@ -47,6 +47,23 @@
         var iframe = document.getElementById('iframe');
         iframe.style.height = height + 'px';
     }
+
+    $('#submitBtn').click(function (data) {
+        var txtChannel = $('#txtChannel').val();
+        var txtAuth = $('#txtAuth').val();
+        $.post("/jiayaosu", {"channel": txtChannel, "auth": txtAuth}).done(function (data) {
+            if(data.error ) {
+                alert(data.error);
+            } else {
+                alert("success");
+            }
+
+        }).fail(function (xhr, status, error) {
+            alert("error");
+        }).always(function (data) {
+        });
+        return false;
+    });
 </script>
 </body>
 </html>
