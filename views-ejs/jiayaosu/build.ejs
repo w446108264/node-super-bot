@@ -13,7 +13,7 @@
     <div>
         <select id="selectVersion" name="selectVersion" onchange="gradeChange()">
             <% targets.forEach(function(target){ %>
-            <option value= <%- target.version %>><%- target.version %></option>
+            <option value= <%- target.version + "%1%2" + target.fileName %>><%- target.version %></option>
             <% }) %>
         </select>
     </div>
@@ -39,8 +39,8 @@
 
     function gradeChange() {
         var objS = document.getElementById("selectVersion");
-        var version = objS.options[objS.selectedIndex].value;
-        document.getElementById("iframe").src = '/jiayaosu/filelist?v=' + version;
+        var data = objS.options[objS.selectedIndex].value;
+        document.getElementById("iframe").src = '/jiayaosu/filelist?v=' + data.split("%1%2")[0];
     }
 
     function resize(height) {
@@ -50,8 +50,12 @@
 
     $('#submitBtn').click(function (data) {
         var txtChannel = $('#txtChannel').val();
+        txtChannel = txtChannel.replace(/\n/g,     "<br>");
         var txtAuth = $('#txtAuth').val();
-        $.post("/jiayaosu", {"channel": txtChannel, "auth": txtAuth}).done(function (data) {
+        var objS = document.getElementById("selectVersion");
+        var data = objS.options[objS.selectedIndex].value;
+
+        $.post("/jiayaosu", {"channel": txtChannel, "auth": txtAuth, "apkFileName": data.split("%1%2")[1]}).done(function (data) {
             if(data.error ) {
                 alert(data.error);
             } else {
