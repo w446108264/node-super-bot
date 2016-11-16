@@ -13,14 +13,14 @@
     <div>
         <select id="selectVersion" name="selectVersion" onchange="gradeChange()">
             <% targets.forEach(function(target){ %>
-            <option value= <%- target.version + "%1%2" + target.fileName %>><%- target.version %></option>
+            <option value= '<%- target.version + "%1%2" + target.fileName %>'><%- target.version %></option>
             <% }) %>
         </select>
     </div>
 
     <iframe style="margin-top:10px" frameborder="0" id="iframe" frameborder="0" width="100%" height="200"></iframe>
 
-    <p>2.补增渠道</p>
+    <p>2.补增渠道 (支持多渠道，换行或空格为渠道分割符，#号为注释符)</p>
     <div>
         <textarea name="txtChannel" cols=40 rows=4 id="txtChannel"> </textarea>
     </div>
@@ -41,6 +41,7 @@
         var objS = document.getElementById("selectVersion");
         var data = objS.options[objS.selectedIndex].value;
         document.getElementById("iframe").src = '/jiayaosu/filelist?v=' + data.split("%1%2")[0];
+
     }
 
     function resize(height) {
@@ -55,12 +56,12 @@
         var objS = document.getElementById("selectVersion");
         var data = objS.options[objS.selectedIndex].value;
 
-        $.post("/jiayaosu", {"channel": txtChannel, "auth": txtAuth, "version": data.split("%1%2")[0], "apkFileName": data.split("%1%2")[1]}).done(function (data) {
-            if(data.error ) {
-                alert(data.error);
+        $.post("/jiayaosu", {"channel": txtChannel, "auth": txtAuth, "version": data.split("%1%2")[0], "apkFileName": data.split("%1%2")[1]}).done(function (results) {
+            if(results.error ) {
+                alert(results.error);
             } else {
-                gradeChange();
                 alert("success");
+                gradeChange();
             }
 
         }).fail(function (xhr, status, error) {

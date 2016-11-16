@@ -1,11 +1,12 @@
 var router = require('koa-router')();
-
 let baseCore = require('core-base');
+var fileUtil = baseCore.getFileUtil();
 let log = baseCore.getLogger();
 
 var pretty = require('prettysize');
 var rd = require('rd');
 var fs = require('fs');
+let async = require('async');
 
 var exec = require('child_process').exec;
 var toolPath = process.cwd() + '/tool/PackerNg-1.0.7-Exhanced.jar';
@@ -62,14 +63,26 @@ router.get('/filelist', async function (ctx, next) {
 
     var channelFiles = [];
 
-    var channelPaths = rd.readFileFilterSync(process.cwd() + '/output/' + version, /\.apk$/);
-    /**
-     * 过滤版本文件 jiayaosu-1.0-dev-preview-2016111209
-     */
-    for (var i = 0; i < channelPaths.length; i++) {
-        exports.getInfo(channelPaths[i], channelFiles, version);
-    }
+    var path = process.cwd() + '/output/' + version;
 
+    await async.auto({
+        make_folder: function (cb) {
+            fileUtil.mkdirs(path, function (err) {
+                if(err) {
+                    return cb(err);
+                }
+                cb(null);
+            });
+        }
+    }, function (error, results) {
+        var channelPaths = rd.readFileFilterSync(path, /\.apk$/);
+        /**
+         * 过滤版本文件 jiayaosu-1.0-dev-preview-2016111209
+         */
+        for (var i = 0; i < channelPaths.length; i++) {
+            exports.getInfo(channelPaths[i], channelFiles, version);
+        }
+    });
     await ctx.render('./jiayaosu/item_filelist.ejs', {
         "channelFiles": channelFiles
     });
@@ -107,44 +120,62 @@ router.post('/', async function (ctx, next) {
         }
         return;
     }
-
-    /**
-     * 校验源Apk 是否存在
-     */
     var sourceApkPath = process.cwd() + "/sourceApk" + apkFileName;
-    await fs.stat(sourceApkPath, function (err, stat) {
-        if (stat && stat.isFile()) {
 
+    await async.auto({
+        checkSourceApk: function (cb) {
+            /**
+             * 校验源Apk 是否存在
+             */
+            fs.stat(sourceApkPath, function (err, stat) {
+                if (stat && stat.isFile()) {
+                    cb(null);
+                } else {
+                    return cb("目标版本不存在!");
+                }
+            });
+        },
+        make_folder: ['checkSourceApk', function (results, cb) {
+            var output = process.cwd() + '/output/' + version + "/";
+            fileUtil.mkdirs(output, function (err) {
+                if (err != null) {
+                    return cb(err);
+                }
+                cb(null, output);
+            });
+        }],
+        exec: ['make_folder', function (results, cb) {
             // 过滤换行
             txtChannel = txtChannel.replace(/<br>/g, " ");
             // 过滤#
             txtChannel = txtChannel.replace(/#[^\s*]*\s*/g, "");
 
-            var output = process.cwd() + '/output/' + version;
             /**
              * shell 命令循环生成Apk
              * @type {string}
              */
-            var cmdStr = 'java -jar ' + toolPath + ' ' + sourceApkPath + ' ' + output + ' -c ' + txtChannel;
-            log.info(cmdStr);
+            var cmdStr = 'java -jar ' + toolPath + ' ' + sourceApkPath + ' ' + results.make_folder + ' -c ' + txtChannel;
             exec(cmdStr, function (err, stdout, stderr) {
-                log.info(cmdStr);
-                if(stdout.indexOf("Success") > 0) {
-
+                if (stdout.indexOf("Success") > 0) {
+                    cb(null);
                 } else {
-                    ctx.body = {
-                        error: "生成补增渠道包失败,请联系管理员!"
-                    }
+                    return cb("生成补增渠道包失败,请联系管理员!");
                 }
             });
+        }]
+    }, function (error, results) {
+        if (error) {
+            ctx.body = {
+                error: error
+            }
+            log.error("补增渠道 -> " + error);
         } else {
             ctx.body = {
-                error: "目标版本不存在!"
+                version: version
             }
-            return;
+            log.info("补增渠道 -> send success!");
         }
     });
-
 })
 
 /**
@@ -200,16 +231,13 @@ exports.getInfo = async function (channelPaths, channelFiles, v) {
              ctime: Wed May 27 2015 18:26:25 GMT+0800 (CST) }}
      */
     fs.stat(channelPaths, function (err, stats) {
-        log.info(channelPaths);
         var channelFile = {
             name: fileName,
             url: "http://139.224.73.230/android/repository/jiayaosu/" + v + fileName,
             size: pretty(stats.size),
             date: exports.formatTime(stats.mtime)
         };
-        log.info(channelFile.name);
         channelFiles.push(channelFile);
-
     })
 }
 
