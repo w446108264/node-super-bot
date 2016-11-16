@@ -55,10 +55,11 @@
         var objS = document.getElementById("selectVersion");
         var data = objS.options[objS.selectedIndex].value;
 
-        $.post("/jiayaosu", {"channel": txtChannel, "auth": txtAuth, "apkFileName": data.split("%1%2")[1]}).done(function (data) {
+        $.post("/jiayaosu", {"channel": txtChannel, "auth": txtAuth, "version": data.split("%1%2")[0], "apkFileName": data.split("%1%2")[1]}).done(function (data) {
             if(data.error ) {
                 alert(data.error);
             } else {
+                gradeChange();
                 alert("success");
             }
 

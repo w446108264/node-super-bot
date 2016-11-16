@@ -8,6 +8,8 @@ var rd = require('rd');
 var fs = require('fs');
 
 var exec = require('child_process').exec;
+var toolPath = process.cwd() + '/tool/PackerNg-1.0.7-Exhanced.jar';
+
 /**
  * 自助渠道包
  */
@@ -56,22 +58,120 @@ router.get('/', async function (ctx, next) {
  * 获取当前版本相关信息和渠道列表
  */
 router.get('/filelist', async function (ctx, next) {
-    var v = ctx.query.v;
+    var version = ctx.query.v;
 
     var channelFiles = [];
 
-    var channelPaths = rd.readFileFilterSync(process.cwd() + '/output/' + v, /\.apk$/);
+    var channelPaths = rd.readFileFilterSync(process.cwd() + '/output/' + version, /\.apk$/);
     /**
      * 过滤版本文件 jiayaosu-1.0-dev-preview-2016111209
      */
     for (var i = 0; i < channelPaths.length; i++) {
-        exports.getInfo(channelPaths[i], channelFiles, v);
+        exports.getInfo(channelPaths[i], channelFiles, version);
     }
 
     await ctx.render('./jiayaosu/item_filelist.ejs', {
         "channelFiles": channelFiles
     });
 })
+
+/**
+ * 补增渠道
+ */
+router.post('/', async function (ctx, next) {
+
+    /**
+     * 获取渠道
+     */
+    var txtChannel = ctx.body.channel;
+    var txtAuth = ctx.body.auth;
+    var version = ctx.body.version;
+    var apkFileName = ctx.body.apkFileName;
+
+    /**
+     * 校验渠道
+     */
+    if (!exports.checkChannel(txtChannel)) {
+        ctx.body = {
+            error: "请输入合法渠道!"
+        }
+        return;
+    }
+
+    /**
+     * 校验授权码
+     */
+    if ("jiayaosu" != txtAuth.trim()) {
+        ctx.body = {
+            error: "请输入正确的授权码!"
+        }
+        return;
+    }
+
+    /**
+     * 校验源Apk 是否存在
+     */
+    var sourceApkPath = process.cwd() + "/sourceApk" + apkFileName;
+    await fs.stat(sourceApkPath, function (err, stat) {
+        if (stat && stat.isFile()) {
+
+            // 过滤换行
+            txtChannel = txtChannel.replace(/<br>/g, " ");
+            // 过滤#
+            txtChannel = txtChannel.replace(/#[^\s*]*\s*/g, "");
+
+            var output = process.cwd() + '/output/' + version;
+            /**
+             * shell 命令循环生成Apk
+             * @type {string}
+             */
+            var cmdStr = 'java -jar ' + toolPath + ' ' + sourceApkPath + ' ' + output + ' -c ' + txtChannel;
+            log.info(cmdStr);
+            exec(cmdStr, function (err, stdout, stderr) {
+                log.info(cmdStr);
+                if(stdout.indexOf("Success") > 0) {
+
+                } else {
+                    ctx.body = {
+                        error: "生成补增渠道包失败,请联系管理员!"
+                    }
+                }
+            });
+        } else {
+            ctx.body = {
+                error: "目标版本不存在!"
+            }
+            return;
+        }
+    });
+
+})
+
+/**
+ * 格式化文件时间
+ * @param time
+ * @returns {string}
+ */
+exports.formatTime = function (time) {
+    var date = new Date(time)
+    return date.getFullYear()
+        + "-" + date.getMonth()
+        + "-" + date.getDay()
+        + " " + date.getHours()
+        + ":" + date.getMinutes();
+}
+
+/**
+ * 校验渠道合法
+ * @param txtChannel
+ * @returns {string}
+ */
+exports.checkChannel = function (txtChannel) {
+    if (txtChannel == null || txtChannel == "") {
+        return false;
+    }
+    return true;
+}
 
 /**
  * 获取文件详细信息
@@ -111,119 +211,6 @@ exports.getInfo = async function (channelPaths, channelFiles, v) {
         channelFiles.push(channelFile);
 
     })
-}
-
-
-/**
- * 补增渠道
- */
-router.post('/', async function (ctx, next) {
-
-    /**
-     * 获取渠道
-     */
-    var txtChannel = ctx.body.channel;
-    var txtAuth = ctx.body.auth;
-    var apkFileName = ctx.body.apkFileName;
-
-    /**
-     * 校验渠道
-     */
-    if (!exports.checkChannel(txtChannel)) {
-        ctx.body = {
-            error: "请输入合法渠道!"
-        }
-        return;
-    }
-
-    /**
-     * 校验授权码
-     */
-    if ("jiayaosu" != txtAuth.trim()) {
-        ctx.body = {
-            error: "请输入正确的授权码!"
-        }
-        return;
-    }
-
-    /**
-     * 校验源Apk 是否存在
-     */
-    var toolPath = process.cwd() + '/tool/PackerNg-1.0.7-Exhanced.jar';
-    var sourceApkPath = process.cwd() + "/sourceApk" + apkFileName;
-    log.info("111");
-    await fs.stat(sourceApkPath, function (err, stat) {
-        log.info("222");
-        if (stat && stat.isFile()) {
-            log.info("333");
-
-
-            /**
-             * 生成渠道包
-             */
-            log.info("11:" + txtChannel);
-            txtChannel = txtChannel.replace(/<br>/g, " ");
-            log.info("33:" + txtChannel);
-            // var channels = txtChannel.split("\n");
-            log.info("xx:" + "  " + txtAuth + "  lll:" + apkFileName);
-            // for (var i = 0; i < channels.length; i++) {
-            //     var channel = channels[i].trim();
-            // }
-
-            /**
-             * shell 命令循环生成Apk
-             * @type {string}
-             */
-            var cmdStr = 'java -jar ' + toolPath + ' ' + sourceApkPath + ' -c ' + txtChannel;
-
-
-            log.info(cmdStr);
-            exec(cmdStr, function (err, stdout, stderr) { 
-                log.info(err + "  " + stdout + "  " + stderr);
-                if (err) {
-                    console.log('get weather api error:' + stderr);
-                } else {
-                    console.log(stdout);
-                }
-            });
-
-        } else {
-            log.info("444");
-            ctx.body = {
-                error: "目标版本不存在!"
-            }
-            return;
-        }
-    });
-    log.info("555");
-
-
-})
-
-/**
- * 格式化文件时间
- * @param time
- * @returns {string}
- */
-exports.formatTime = function (time) {
-    var date = new Date(time)
-    return date.getFullYear()
-        + "-" + date.getMonth()
-        + "-" + date.getDay()
-        + " " + date.getHours()
-        + ":" + date.getMinutes();
-}
-
-/**
- * 校验渠道合法
- * @param txtChannel
- * @returns {string}
- */
-exports.checkChannel = function (txtChannel) {
-    if (txtChannel == null || txtChannel == "") {
-        return false;
-    }
-    return true;
 }
 
 module.exports = router;
