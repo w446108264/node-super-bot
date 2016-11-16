@@ -9,7 +9,36 @@ var fs = require('fs');
 let async = require('async');
 
 var exec = require('child_process').exec;
+
+/**
+ * 打包工具jar路径
+ * @type {string}
+ */
 var toolPath = process.cwd() + '/tool/PackerNg-1.0.7-Exhanced.jar';
+
+/**
+ * 源程序路径 root path
+ * @type {string}
+ */
+var sourceApkRootPath = process.cwd() + '/sourceApk';
+
+/**
+ * 输出版本渠道路径 root path
+ * @type {string}
+ */
+var outputRootPath = process.cwd() + '/output/';
+
+/**
+ * Apk下载路径 root path
+ * @type {string}
+ */
+var downloadRootPath = "http://139.224.73.230/android/repository/jiayaosu/";
+
+/**
+ * 补增渠道授权口令
+ * @type {string}
+ */
+var authCode = "jiayaosu_marter";
 
 /**
  * 自助渠道包
@@ -25,7 +54,7 @@ router.get('/', async function (ctx, next) {
     /**
      * 获取源程序目录下所有文件
      */
-    var files = rd.readFileFilterSync(process.cwd() + '/sourceApk', /\.apk$/);
+    var files = rd.readFileFilterSync(sourceApkRootPath, /\.apk$/);
 
     /**
      * 过滤版本文件 jiayaosu-1.0-dev-preview-2016111209.apk
@@ -63,7 +92,7 @@ router.get('/filelist', async function (ctx, next) {
 
     var channelFiles = [];
 
-    var path = process.cwd() + '/output/' + version;
+    var path = outputRootPath + version;
 
     await async.auto({
         make_folder: function (cb) {
@@ -114,14 +143,13 @@ router.post('/', async function (ctx, next) {
     /**
      * 校验授权码
      */
-    if ("jiayaosu" != txtAuth.trim()) {
+    if (authCode != txtAuth.trim()) {
         ctx.body = {
             error: "请输入正确的授权码!"
         }
         return;
     }
-    var sourceApkPath = process.cwd() + "/sourceApk" + apkFileName;
-
+    var sourceApkPath = sourceApkRootPath + apkFileName;
     await async.auto({
         checkSourceApk: function (cb) {
             /**
@@ -136,7 +164,7 @@ router.post('/', async function (ctx, next) {
             });
         },
         make_folder: ['checkSourceApk', function (results, cb) {
-            var output = process.cwd() + '/output/' + version + "/";
+            var output = outputRootPath + version + "/";
             fileUtil.mkdirs(output, function (err) {
                 if (err != null) {
                     return cb(err);
@@ -233,7 +261,7 @@ exports.getInfo = async function (channelPaths, channelFiles, v) {
     fs.stat(channelPaths, function (err, stats) {
         var channelFile = {
             name: fileName,
-            url: "http://139.224.73.230/android/repository/jiayaosu/" + v + fileName,
+            url: downloadRootPath + v + fileName,
             size: pretty(stats.size),
             date: exports.formatTime(stats.mtime)
         };
