@@ -9,6 +9,7 @@ var fs = require('fs');
 let async = require('async');
 
 var exec = require('child_process').exec;
+var channelATM = g_config.channelATM;
 
 /**
  * 打包工具jar路径
@@ -20,25 +21,31 @@ var toolPath = process.cwd() + '/tool/PackerNg-1.0.7-Exhanced.jar';
  * 源程序路径 root path
  * @type {string}
  */
-var sourceApkRootPath = process.cwd() + '/sourceApk';
+var sourceApkRootPath = channelATM.sourceApkRootPath;
 
 /**
  * 输出版本渠道路径 root path
  * @type {string}
  */
-var outputRootPath = process.cwd() + '/output/';
+var outputRootPath = channelATM.outputRootPath;
 
 /**
  * Apk下载路径 root path
  * @type {string}
  */
-var downloadRootPath = "http://139.224.73.230/android/repository/jiayaosu/";
+var downloadRootPath = channelATM.downloadRootPath;
 
 /**
  * 补增渠道授权口令
  * @type {string}
  */
-var authCode = "jiayaosu_marter";
+var authCode = channelATM.authCode;
+
+/**
+* title
+* @type {string}
+*/
+var title = channelATM.title;
 
 /**
  * 自助渠道包
@@ -46,10 +53,14 @@ var authCode = "jiayaosu_marter";
 router.get('/', async function (ctx, next) {
 
     ctx.state = {
-        title: '家的要素-Android 渠道包自助😁'
+        title: title
     };
 
     var targets = [];
+
+    fileUtil.mkdirs(sourceApkRootPath, function (error) {
+        
+    });
 
     /**
      * 获取源程序目录下所有文件
