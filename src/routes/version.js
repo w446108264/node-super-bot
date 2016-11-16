@@ -231,7 +231,7 @@ function pushUpdateToSlack(matchapp_config, body) {
  */
 router.get('/build', async function (ctx, next) {
 
-
+    var appid = ctx.query.appid;
     if (appid == null) {
         ctx.state = {
             message: "appid can't be null!",
